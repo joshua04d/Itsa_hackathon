@@ -6,8 +6,12 @@ const RootProviders = ({children}: {children: ReactNode} ) => {
     <ThemeProvider
         attribute='class'
         defaultTheme='dark'
-        
-    />
+        enableSystem
+        disableTransitionOnChange
+    >
+      {children}
+    </ThemeProvider>
+
   )
 }
 
