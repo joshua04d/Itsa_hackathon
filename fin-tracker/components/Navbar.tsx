@@ -1,13 +1,15 @@
 "use client"
-import Logo from '@/app/components/Logo'
+import Logo, { LogoMobile } from '@/app/components/Logo'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
-import { buttonVariants } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 import { UserButton } from '@clerk/nextjs'
 import { ThemeSwitcherBtn } from './ThemeSwitcherBtn';
-import Sheet from '@/components/ui/sheet'
+import  { SheetTrigger, Sheet, SheetContent } from '@/components/ui/sheet'
+import { Menu } from "lucide-react"
+
 
 const Navbar = () => {
   return (
@@ -35,14 +37,39 @@ const item = [
 
 
 function MobileNavbar(){
-    const [isOpen, setIsOpen ]= useState(false)
+     const [isOpen, setIsOpen] = useState(false)
 
     return(
         <div className='block border-separate bg-background md:hidden'>
             <nav className='container flex items-center justify-between px-8' >
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                    
+                    <SheetTrigger asChild>
+                        <Button variant={"ghost"} size={"icon"}>
+                            <Menu />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent className='w-[w-400px] sm:w-[540]' side="left" >
+                        <Logo />
+                        <div className="flex flex-col gap-1 pt-4">
+                            {item.map((item) => (
+                                <NavbarItem 
+                                    key={item.label}
+                                    link={item.link}
+                                    label={item.label}   
+                                    clickCallback={()=> setIsOpen((prev) => !prev)}
+                                />
+                            )
+                        )}
+                        </div>
+                    </SheetContent>
                 </Sheet>
+                <div className="flex h-80px min-h-[60px] items-center gap-x-4">
+                    <LogoMobile />
+                </div>
+                <div className="flex items-center gap-2">
+                    <ThemeSwitcherBtn />
+                    <UserButton afterSignOutUrl="sign-in" />
+                </div>
             </nav>
         </div>
     )
@@ -76,9 +103,10 @@ function DesktopNavbar(){
     )
 }
 
-function NavbarItem ({link, label}:{
+function NavbarItem ({link, label ,clickCallback}:{
     link:string;
-    label:string
+    label:string;
+    clickCallback ?: () => void
 }){
     const pathname = usePathname();
     const isActive = pathname === link
@@ -90,7 +118,13 @@ function NavbarItem ({link, label}:{
                 }),
                 "w-full justify-start text-lg text-muted-foreground hover:text-foreground",
                 isActive && "text-foreground"
-            )}> 
+            )}
+            onClick={()=>{
+                if(clickCallback) {
+                    clickCallback()
+                }
+            }}
+            > 
             {label} 
             </Link>
             {
